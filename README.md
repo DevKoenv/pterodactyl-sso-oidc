@@ -133,7 +133,7 @@ All settings live under `Admin > Extensions > OIDC SSO Login`:
 
 1. **Install the extension** — see "Installation" below.
 2. **Register a confidential OIDC client** at your provider (authentik,
-   Keycloak, Azure AD, ...). Open `/admin/extensions/sso_oidc` in Pterodactyl
+   Keycloak, Azure AD, ...). Open `/admin/extensions/ssooidc` in Pterodactyl
    first to get the exact **Redirect / Callback URL** to register there.
 3. **Fill in Issuer URL, Client ID and Client Secret** on the extension's
    admin page. The issuer's `.well-known/openid-configuration` is fetched
@@ -158,12 +158,12 @@ what each setting actually does and why it's built the way it is.
 
 ## Installation
 
-1. Download the latest `sso_oidc.blueprint` file from the
+1. Download the latest `ssooidc.blueprint` file from the
    [Releases](https://github.com/DevKoenv/pterodactyl-sso-oidc/releases) page.
 2. Upload it to your panel and run:
 
    ```bash
-   blueprint -install sso_oidc.blueprint
+   blueprint -install ssooidc.blueprint
    ```
 
 After installing, set the callback URL shown on the extension's admin page as
@@ -177,7 +177,7 @@ Front-Channel Logout).
 ## Uninstallation
 
 ```bash
-blueprint -remove sso_oidc
+blueprint -remove ssooidc
 ```
 
 `data/remove.sh` reverts the `NavigationBar.tsx` and `admin.blade.php`

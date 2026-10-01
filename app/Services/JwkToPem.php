@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Services;
+namespace Pterodactyl\BlueprintFramework\Extensions\ssooidc\Services;
 
 use RuntimeException;
 

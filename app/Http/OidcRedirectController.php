@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Http;
+namespace Pterodactyl\BlueprintFramework\Extensions\ssooidc\Http;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Services\OidcClientService;
+use Pterodactyl\BlueprintFramework\Extensions\ssooidc\Services\OidcClientService;
 use RuntimeException;
 
 class OidcRedirectController extends Controller
@@ -33,7 +33,7 @@ class OidcRedirectController extends Controller
         $now = time();
         $expiresAt = $now + 600; // 10 minutes
 
-        $attempts = $request->session()->get('sso_oidc.attempts', []);
+        $attempts = $request->session()->get('ssooidc.attempts', []);
 
         if (!is_array($attempts)) {
             $attempts = [];
@@ -71,7 +71,7 @@ class OidcRedirectController extends Controller
             'expires_at' => $expiresAt,
         ];
 
-        $request->session()->put('sso_oidc.attempts', $attempts);
+        $request->session()->put('ssooidc.attempts', $attempts);
 
         $redirectUri = $this->extensionUrl('/extensions/{identifier}/callback');
 

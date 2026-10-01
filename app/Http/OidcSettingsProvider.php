@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Http;
+namespace Pterodactyl\BlueprintFramework\Extensions\ssooidc\Http;
 
 use Illuminate\Support\Facades\Crypt;
 use Pterodactyl\BlueprintFramework\Libraries\ExtensionLibrary\Admin\BlueprintAdminLibrary as BlueprintExtensionLibrary;

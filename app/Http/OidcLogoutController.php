@@ -1,12 +1,12 @@
 <?php
 
-namespace Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Http;
+namespace Pterodactyl\BlueprintFramework\Extensions\ssooidc\Http;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Services\OidcDiscoveryService;
+use Pterodactyl\BlueprintFramework\Extensions\ssooidc\Services\OidcDiscoveryService;
 use Throwable;
 
 /**
@@ -85,7 +85,7 @@ class OidcLogoutController extends Controller
     /**
      * Reference-token pattern: the cookie set at login (OidcCallbackController)
      * only ever holds the (by-then-defunct) session_id, never the id_token
-     * itself - looks the matching sso_oidc_sessions row up by it, and always
+     * itself - looks the matching ssooidc_sessions row up by it, and always
      * consumes both (cookie forgotten, row deleted) whether or not a row
      * was actually found. Read from the raw $_COOKIE superglobal, not
      * Laravel's $request->cookie(): the cookie is deliberately set via
@@ -95,9 +95,9 @@ class OidcLogoutController extends Controller
      */
     private function consumeIdTokenHint(): ?string
     {
-        $sessionId = $_COOKIE['sso_oidc_idth'] ?? null;
+        $sessionId = $_COOKIE['ssooidc_idth'] ?? null;
 
-        setcookie('sso_oidc_idth', '', [
+        setcookie('ssooidc_idth', '', [
             'expires' => time() - 3600,
             'path' => '/',
             'secure' => true,
@@ -109,7 +109,7 @@ class OidcLogoutController extends Controller
             return null;
         }
 
-        $row = DB::table('sso_oidc_sessions')
+        $row = DB::table('ssooidc_sessions')
             ->where('session_id', $sessionId)
             ->first();
 
@@ -118,7 +118,7 @@ class OidcLogoutController extends Controller
         }
 
         // Consume the row regardless of whether token decryption succeeds.
-        DB::table('sso_oidc_sessions')
+        DB::table('ssooidc_sessions')
             ->where('id', $row->id)
             ->delete();
 

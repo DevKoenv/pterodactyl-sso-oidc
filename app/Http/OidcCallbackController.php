@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Http;
+namespace Pterodactyl\BlueprintFramework\Extensions\ssooidc\Http;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Pterodactyl\Http\Controllers\Controller;
 use Pterodactyl\Models\User;
-use Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Services\OidcClientService;
-use Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Services\OidcUserProvisioningService;
+use Pterodactyl\BlueprintFramework\Extensions\ssooidc\Services\OidcClientService;
+use Pterodactyl\BlueprintFramework\Extensions\ssooidc\Services\OidcUserProvisioningService;
 use RuntimeException;
 
 class OidcCallbackController extends Controller
@@ -36,7 +36,7 @@ class OidcCallbackController extends Controller
             throw new RuntimeException('Invalid OIDC state parameter.');
         }
 
-        $attempts = $request->session()->get('sso_oidc.attempts', []);
+        $attempts = $request->session()->get('ssooidc.attempts', []);
 
         if (!is_array($attempts)) {
             throw new RuntimeException('Invalid OIDC login session.');
@@ -47,7 +47,7 @@ class OidcCallbackController extends Controller
         // Consume the attempt immediately. Each state value is one-time use,
         // including when token exchange or claim validation fails.
         unset($attempts[$state]);
-        $request->session()->put('sso_oidc.attempts', $attempts);
+        $request->session()->put('ssooidc.attempts', $attempts);
 
         if (!is_array($attempt)) {
             throw new RuntimeException('Invalid or expired OIDC login attempt.');
@@ -129,7 +129,7 @@ class OidcCallbackController extends Controller
 
         $this->cleanupExpiredSsoSessions();
 
-        setcookie('sso_oidc_idth', $sessionId, [
+        setcookie('ssooidc_idth', $sessionId, [
             'expires' => time() + ((int) config('session.lifetime', 720) * 60),
             'path' => '/',
             'secure' => true,
@@ -217,7 +217,7 @@ class OidcCallbackController extends Controller
             return;
         }
 
-        DB::table('sso_oidc_sessions')->insert([
+        DB::table('ssooidc_sessions')->insert([
             'sid' => isset($claims['sid']) ? (string) $claims['sid'] : null,
             'subject' => $subject,
             'session_id' => $sessionId,

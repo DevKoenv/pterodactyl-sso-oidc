@@ -143,7 +143,7 @@ class OidcUserProvisioningService
 
         return Str::substr($username, 0, 180);
     }
-    
+
     private function usernameAvailable(string $username, int $exceptUserId): bool
     {
         return !User::where('username', $username)->where('id', '!=', $exceptUserId)->exists();
@@ -151,11 +151,12 @@ class OidcUserProvisioningService
 
     private function uniqueUsername(string $desired): string
     {
-        $username = $desired;
+        $base = Str::substr($desired, 0, 180);
+        $username = $base;
         $suffix = 1;
 
         while (User::where('username', $username)->exists()) {
-            $username = $desired . $suffix;
+            $username = $base . $suffix;
             $suffix++;
         }
 

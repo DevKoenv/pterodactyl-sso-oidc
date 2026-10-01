@@ -5,6 +5,7 @@ namespace Pterodactyl\BlueprintFramework\Extensions\ssooidc\Services;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Pterodactyl\Models\User;
+use Ramsey\Uuid\Uuid;
 use RuntimeException;
 
 /**
@@ -63,6 +64,7 @@ class OidcUserProvisioningService
         }
 
         $user = new User();
+        $user->uuid = Uuid::uuid4()->toString();
         $user->email = $email;
         $user->username = $this->uniqueUsername($desiredUsername);
         $user->name_first = $firstName;

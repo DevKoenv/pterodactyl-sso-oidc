@@ -30,6 +30,18 @@ class OidcUserProvisioningService
             throw new RuntimeException('OIDC provider did not return an email claim.');
         }
 
+        $email = Str::lower(trim($email));
+
+        # check if the email is valid instead of assuming it is
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw new RuntimeException('OIDC provider returned an invalid email claim.');
+        }
+
+        # only allow verfied emails
+        if (($claims['email_verified'] ?? false) !== true) {
+            throw new RuntimeException('OIDC provider did not verify the email address.');
+        }
+
         $desiredUsername = $this->deriveUsername($claims, $email);
         $firstName = $this->claim($claims, 'claim_first_name') ?: 'SSO';
         $lastName = $this->claim($claims, 'claim_last_name') ?: 'User';

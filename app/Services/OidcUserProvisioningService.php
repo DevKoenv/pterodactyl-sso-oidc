@@ -129,15 +129,21 @@ class OidcUserProvisioningService
 
     private function deriveUsername(array $claims, string $email): string
     {
-        $raw = $this->claim($claims, 'claim_username') ?: Str::before($email, '@');
+        $raw = $this->claim($claims, 'claim_username')
+            ?: Str::before($email, '@');
 
-        // Pterodactyl usernames are stored lowercase and limited to
-        // alphanumeric characters plus a small set of symbols.
-        $normalized = Str::of($raw)->lower()->replaceMatches('/[^a-z0-9_.-]/', '');
+        $username = (string) Str::of($raw)
+            ->lower()
+            ->replaceMatches('/[^a-z0-9_.-]/', '')
+            ->trim('_.-');
 
-        return (string) ($normalized->isEmpty() ? Str::of('user')->append(Str::random(6)) : $normalized);
+        if ($username === '') {
+            $username = 'user' . Str::lower(Str::random(8));
+        }
+
+        return Str::substr($username, 0, 180);
     }
-
+    
     private function usernameAvailable(string $username, int $exceptUserId): bool
     {
         return !User::where('username', $username)->where('id', '!=', $exceptUserId)->exists();

@@ -5,6 +5,7 @@ namespace Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Http;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Pterodactyl\Http\Controllers\Controller;
 use Pterodactyl\Models\User;
@@ -15,6 +16,7 @@ use RuntimeException;
 class OidcCallbackController extends Controller
 {
     use OidcSettingsProvider;
+    use KillsSsoSessions;
 
     public function __construct(private OidcClientService $client)
     {
@@ -125,6 +127,8 @@ class OidcCallbackController extends Controller
             (string) $tokens['id_token']
         );
 
+        $this->cleanupExpiredSsoSessions();
+
         setcookie('sso_oidc_idth', $sessionId, [
             'expires' => time() + ((int) config('session.lifetime', 720) * 60),
             'path' => '/',
@@ -218,7 +222,7 @@ class OidcCallbackController extends Controller
             'subject' => $subject,
             'session_id' => $sessionId,
             'user_id' => $user->id,
-            'id_token' => $idToken,
+            'id_token' => Crypt::encryptString($idToken),
             'created_at' => now(),
         ]);
     }

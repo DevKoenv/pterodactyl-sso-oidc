@@ -61,10 +61,9 @@ class OidcBackchannelLogoutController extends Controller
         $matched = $this->killMatchingSessions($sid, $subject);
 
         Log::info('sso_oidc backchannel-logout received', [
-            'claims' => $claims,
             'looked_up_by' => $sid !== null ? 'sid' : 'subject',
-            'sid' => $sid,
-            'subject' => $subject,
+            'sid_present' => $sid !== null,
+            'subject_present' => $subject !== null,
             'matched_rows' => $matched,
         ]);
 

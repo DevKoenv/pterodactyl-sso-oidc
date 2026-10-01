@@ -53,8 +53,15 @@ trait KillsSsoSessions
         // here or (for the exact same session) at RP-Initiated Logout, so
         // sessions that just expire without an explicit logout event would
         // otherwise accumulate forever.
-        DB::table('sso_oidc_sessions')->where('created_at', '<', now()->subDays(30))->delete();
+        $this->cleanupExpiredSsoSessions();
 
         return $sessions->count();
+    }
+
+    protected function cleanupExpiredSsoSessions(): int
+    {
+        return DB::table('sso_oidc_sessions')
+            ->where('created_at', '<', now()->subDays(30))
+            ->delete();
     }
 }

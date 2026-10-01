@@ -3,6 +3,7 @@
 namespace Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Http;
 
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Pterodactyl\Http\Controllers\Controller;
 use Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Services\OidcDiscoveryService;
@@ -95,18 +96,41 @@ class OidcLogoutController extends Controller
     private function consumeIdTokenHint(): ?string
     {
         $sessionId = $_COOKIE['sso_oidc_idth'] ?? null;
-        setcookie('sso_oidc_idth', '', ['expires' => time() - 3600, 'path' => '/']);
 
-        if (!$sessionId) {
+        setcookie('sso_oidc_idth', '', [
+            'expires' => time() - 3600,
+            'path' => '/',
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
+
+        if (!$sessionId || !is_string($sessionId)) {
             return null;
         }
 
-        $row = DB::table('sso_oidc_sessions')->where('session_id', $sessionId)->first();
+        $row = DB::table('sso_oidc_sessions')
+            ->where('session_id', $sessionId)
+            ->first();
 
-        if ($row) {
-            DB::table('sso_oidc_sessions')->where('id', $row->id)->delete();
+        if (!$row) {
+            return null;
         }
 
-        return $row->id_token ?? null;
+        // Consume the row regardless of whether token decryption succeeds.
+        DB::table('sso_oidc_sessions')
+            ->where('id', $row->id)
+            ->delete();
+
+        if (!is_string($row->id_token) || $row->id_token === '') {
+            return null;
+        }
+
+        try {
+            return Crypt::decryptString($row->id_token);
+        } catch (Throwable) {
+            // Never send an invalid or undecryptable token to the IdP.
+            return null;
+        }
     }
 }

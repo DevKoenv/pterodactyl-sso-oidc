@@ -62,8 +62,8 @@ class OidcFrontchannelLogoutController extends Controller
         $matched = $this->killMatchingSessions((string) $sid, null);
 
         Log::info('sso_oidc frontchannel-logout received', [
-            'sid' => $sid,
-            'iss' => $iss,
+            'issuer_present' => is_string($iss) && $iss !== '',
+            'sid_present' => is_string($sid) && $sid !== '',
             'matched_rows' => $matched,
         ]);
 

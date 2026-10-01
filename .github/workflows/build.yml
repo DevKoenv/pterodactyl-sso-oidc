@@ -1,0 +1,43 @@
+name: Build Blueprint Extension
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Blueprint extension
+        uses: blueprint-community/action-export@main
+
+      - name: List generated packages
+        run: |
+          shopt -s nullglob
+          packages=(*.blueprint)
+
+          if [ "${#packages[@]}" -eq 0 ]; then
+            echo "No .blueprint package was generated."
+            exit 1
+          fi
+
+          printf '%s\n' "${packages[@]}"
+          ls -lh "${packages[@]}"
+
+      - name: Upload Blueprint artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: blueprint-extension-${{ github.sha }}
+          path: '*.blueprint'
+          if-no-files-found: error
+          retention-days: 14

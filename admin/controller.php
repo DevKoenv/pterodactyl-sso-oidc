@@ -21,6 +21,7 @@ class {identifier}ExtensionController extends Controller
      */
     private const SETTINGS = [
         'enabled',
+        'allow_registration',
         'issuer',
         'client_id',
         'scopes',
@@ -105,6 +106,7 @@ class {identifier}SettingsFormRequest extends AdminFormRequest
     {
         return [
             'enabled' => ['nullable', 'boolean'],
+            'allow_registration' => ['nullable', 'boolean'],
             'issuer' => ['nullable', 'string', 'url'],
             'client_id' => ['nullable', 'string'],
             // Always optional at the validation level - blank means "keep
@@ -129,6 +131,7 @@ class {identifier}SettingsFormRequest extends AdminFormRequest
     {
         return [
             'enabled' => 'Enabled',
+            'allow_registration' => 'Allow Just-in-Time Account Creation',
             'issuer' => 'Issuer URL',
             'client_id' => 'Client ID',
             'client_secret' => 'Client Secret',
@@ -160,6 +163,7 @@ class {identifier}SettingsFormRequest extends AdminFormRequest
         $data = $this->validated();
 
         $data['enabled'] = $this->boolean('enabled') ? '1' : '0';
+        $data['allow_registration'] = $this->boolean('allow_registration') ? '1' : '0';
         $data['hide_password_login'] = $this->boolean('hide_password_login') ? '1' : '0';
 
         return $data;

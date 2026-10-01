@@ -11,6 +11,7 @@ use Pterodactyl\Http\Controllers\Controller;
 use Pterodactyl\Models\User;
 use Pterodactyl\BlueprintFramework\Extensions\ssooidc\Services\OidcClientService;
 use Pterodactyl\BlueprintFramework\Extensions\ssooidc\Services\OidcUserProvisioningService;
+use Pterodactyl\BlueprintFramework\Extensions\ssooidc\Exceptions\OidcProvisioningException;
 use RuntimeException;
 
 class OidcCallbackController extends Controller
@@ -111,8 +112,13 @@ class OidcCallbackController extends Controller
             );
         }
 
-        $provisioning = new OidcUserProvisioningService($settings);
-        $user = $provisioning->resolve($claims);
+        try {
+            $provisioning = new OidcUserProvisioningService($settings);
+            $user = $provisioning->resolve($claims);
+        } catch (OidcProvisioningException) {
+            return redirect('/auth/login?auto_sso=0')
+                ->with('error', 'Your SSO account is not registered on this panel.');
+        }
 
         // Mirrors Pterodactyl's own login response, without the TOTP
         // checkpoint because authentication was handled by the IdP.

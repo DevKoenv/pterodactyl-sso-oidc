@@ -57,6 +57,23 @@
                         </div>
                         <div class="form-group">
                             <label>
+                                <input
+                                    type="checkbox"
+                                    name="allow_registration"
+                                    value="1"
+                                    @if(($allow_registration ?? '1') === '1') checked @endif
+                                />
+                                Allow just-in-time account creation
+                            </label>
+
+                            <p class="text-muted small">
+                                Existing Pterodactyl users can always sign in through OIDC.
+                                When disabled, SSO login is rejected if the email does not already
+                                belong to a Pterodactyl account.
+                            </p>
+                        </div>
+                        <div class="form-group">
+                            <label>
                                 <input type="checkbox" name="hide_password_login" value="1" @if($hide_password_login === '1') checked @endif />
                                 Hide username/password login (redirect straight to the provider)
                             </label>

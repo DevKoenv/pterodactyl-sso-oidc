@@ -21,6 +21,7 @@ trait OidcSettingsProvider
 
         $settings = $blueprint->dbGetMany('{identifier}', [
             'enabled',
+            'allow_registration',
             'issuer',
             'client_id',
             'client_secret',

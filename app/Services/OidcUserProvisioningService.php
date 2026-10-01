@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Pterodactyl\Models\User;
 use Ramsey\Uuid\Uuid;
 use RuntimeException;
+use Pterodactyl\BlueprintFramework\Extensions\ssooidc\Exceptions\OidcProvisioningException;
 
 /**
  * Resolves an authenticated OIDC identity (claims) to a Pterodactyl User,
@@ -49,6 +50,12 @@ class OidcUserProvisioningService
 
         /** @var User|null $user */
         $user = User::where('email', $email)->first();
+
+        if (!$user && ($this->settings['allow_registration'] ?? '1') !== '1') {
+            throw new OidcProvisioningException(
+                'No existing account was found and automatic account creation is disabled.'
+            );
+        }
 
         if ($user) {
             $user->name_first = $firstName;

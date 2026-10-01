@@ -27,6 +27,14 @@ class OidcClientService
     {
         $document = $this->discovery->discover($settings['issuer']);
 
+        $methods = $document['code_challenge_methods_supported'] ?? null;
+
+        if (is_array($methods) && !in_array('S256', $methods, true)) {
+            throw new RuntimeException(
+                'OIDC provider does not support the required PKCE S256 method.'
+            );
+        }
+
         $params = [
             'response_type' => 'code',
             'client_id' => $settings['client_id'],

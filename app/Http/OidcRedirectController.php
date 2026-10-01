@@ -28,47 +28,87 @@ class OidcRedirectController extends Controller
 
         $state = bin2hex(random_bytes(32));
         $nonce = bin2hex(random_bytes(32));
-        // PKCE (RFC 7636): hex is a valid (if unusual) code_verifier charset -
-        // every character is in the spec's unreserved set - so this reuses
-        // the same generation style as state/nonce instead of introducing a
-        // separate base64url-random helper just for this.
         $codeVerifier = bin2hex(random_bytes(32));
 
-        $request->session()->put('sso_oidc.state', $state);
-        $request->session()->put('sso_oidc.nonce', $nonce);
-        $request->session()->put('sso_oidc.code_verifier', $codeVerifier);
-        $request->session()->put(
-            'ssooidc.intended',
-            $this->safeRedirectPath($request->query('redirect_to'))
+        $now = time();
+        $expiresAt = $now + 600; // 10 minutes
+
+        $attempts = $request->session()->get('sso_oidc.attempts', []);
+
+        if (!is_array($attempts)) {
+            $attempts = [];
+        }
+
+        // Remove malformed and expired attempts.
+        $attempts = array_filter(
+            $attempts,
+            static fn (mixed $attempt): bool =>
+                is_array($attempt)
+                && is_int($attempt['expires_at'] ?? null)
+                && $attempt['expires_at'] >= $now
         );
 
-        // Optional UX nicety: if the caller already knows who's likely
-        // logging in (e.g. a link built with ?login_hint=user@example.com),
-        // forward it so the provider can pre-fill its login form. Nothing
-        // in this extension's own UI supplies one today, but the plumbing
-        // is here for callers/integrations that do.
+        // Keep at most three existing attempts before adding this one.
+        // This limits session growth while allowing multiple browser tabs.
+        if (count($attempts) >= 4) {
+            uasort(
+                $attempts,
+                static fn (array $a, array $b): int =>
+                    ($a['created_at'] ?? 0) <=> ($b['created_at'] ?? 0)
+            );
+
+            $attempts = array_slice($attempts, -3, null, true);
+        }
+
         $loginHint = $request->query('login_hint');
 
+        $attempts[$state] = [
+            'nonce' => $nonce,
+            'code_verifier' => $codeVerifier,
+            'intended' => $this->safeRedirectPath($request->query('redirect_to')),
+            'login_hint' => is_string($loginHint) ? $loginHint : null,
+            'created_at' => $now,
+            'expires_at' => $expiresAt,
+        ];
+
+        $request->session()->put('sso_oidc.attempts', $attempts);
+
         $redirectUri = $this->extensionUrl('/extensions/{identifier}/callback');
+
         $authorizationUrl = $this->client->buildAuthorizationUrl(
             $settings,
             $redirectUri,
             $state,
             $nonce,
             $codeVerifier,
-            $loginHint ? (string) $loginHint : null
+            is_string($loginHint) && $loginHint !== '' ? $loginHint : null
         );
 
         return redirect()->away($authorizationUrl);
     }
 
-    private function safeRedirectPath(?string $value): string
+    private function safeRedirectPath(mixed $value): string
     {
-        if (!$value || !str_starts_with($value, '/')) {
+        if (!is_string($value) || $value === '') {
             return '/';
         }
 
-        if (str_starts_with($value, '//') || preg_match('/[\r\n]/', $value)) {
+        // Only allow a local absolute path.
+        if (!str_starts_with($value, '/')) {
+            return '/';
+        }
+
+        // Reject protocol-relative URLs and backslash-based URL variants.
+        if (
+            str_starts_with($value, '//')
+            || str_starts_with($value, '/\\')
+            || str_contains($value, '\\')
+        ) {
+            return '/';
+        }
+
+        // Reject header-injection/control characters.
+        if (preg_match('/[\x00-\x1F\x7F\r\n]/', $value)) {
             return '/';
         }
 

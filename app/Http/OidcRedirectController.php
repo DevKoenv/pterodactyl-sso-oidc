@@ -37,7 +37,10 @@ class OidcRedirectController extends Controller
         $request->session()->put('sso_oidc.state', $state);
         $request->session()->put('sso_oidc.nonce', $nonce);
         $request->session()->put('sso_oidc.code_verifier', $codeVerifier);
-        $request->session()->put('sso_oidc.intended', $request->query('redirect_to', '/'));
+        $request->session()->put(
+            'ssooidc.intended',
+            $this->safeRedirectPath($request->query('redirect_to'))
+        );
 
         // Optional UX nicety: if the caller already knows who's likely
         // logging in (e.g. a link built with ?login_hint=user@example.com),
@@ -57,5 +60,18 @@ class OidcRedirectController extends Controller
         );
 
         return redirect()->away($authorizationUrl);
+    }
+
+    private function safeRedirectPath(?string $value): string
+    {
+        if (!$value || !str_starts_with($value, '/')) {
+            return '/';
+        }
+
+        if (str_starts_with($value, '//') || preg_match('/[\r\n]/', $value)) {
+            return '/';
+        }
+
+        return $value;
     }
 }

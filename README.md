@@ -1,4 +1,4 @@
-# ssooidc
+# Pterodactyl SSO - OIDC
 
 A Blueprint extension for [Pterodactyl](https://pterodactyl.io) that adds
 **OpenID Connect (OIDC) single sign-on login**, as an addition to the built-in
@@ -89,7 +89,7 @@ Key design points:
   otherwise generate a mismatched `http://` URL.
 - **Logout is patched to reach the IdP too**: both the client dashboard's
   and admin panel's logout buttons are redirected to
-  `/extensions/ssooidc/logout`, which performs **RP-Initiated Logout**
+  `/extensions/sso-oidc/logout`, which performs **RP-Initiated Logout**
   (`end_session_endpoint`, with `id_token_hint` sourced from a DB-backed
   reference token — a raw id_token was tried first but overflowed reverse
   proxy header buffers). **Back-Channel** and **Front-Channel Logout**
@@ -106,7 +106,7 @@ Key design points:
   encoder, since it has no built-in JWK parser.
 - **`remove.sh` cleans up the database itself**: `blueprint -remove` only
   deletes files, never runs migration rollbacks, so settings rows, the
-  `ssooidc_sessions` table and migration-tracking rows would otherwise
+  `sso-oidc_sessions` table and migration-tracking rows would otherwise
   linger forever after uninstall.
 
 See the inline code comments and controller docblocks for the full
@@ -133,7 +133,7 @@ All settings live under `Admin > Extensions > OIDC SSO Login`:
 
 1. **Install the extension** — see "Installation" below.
 2. **Register a confidential OIDC client** at your provider (authentik,
-   Keycloak, Azure AD, ...). Open `/admin/extensions/ssooidc` in Pterodactyl
+   Keycloak, Azure AD, ...). Open `/admin/extensions/sso_oidc` in Pterodactyl
    first to get the exact **Redirect / Callback URL** to register there.
 3. **Fill in Issuer URL, Client ID and Client Secret** on the extension's
    admin page. The issuer's `.well-known/openid-configuration` is fetched
@@ -158,12 +158,12 @@ what each setting actually does and why it's built the way it is.
 
 ## Installation
 
-1. Download the latest `ssooidc.blueprint` file from the
+1. Download the latest `sso_oidc.blueprint` file from the
    [Releases](https://github.com/DevKoenv/pterodactyl-sso-oidc/releases) page.
 2. Upload it to your panel and run:
 
    ```bash
-   blueprint -install ssooidc.blueprint
+   blueprint -install sso_oidc.blueprint
    ```
 
 After installing, set the callback URL shown on the extension's admin page as
@@ -177,7 +177,7 @@ Front-Channel Logout).
 ## Uninstallation
 
 ```bash
-blueprint -remove ssooidc
+blueprint -remove sso_oidc
 ```
 
 `data/remove.sh` reverts the `NavigationBar.tsx` and `admin.blade.php`

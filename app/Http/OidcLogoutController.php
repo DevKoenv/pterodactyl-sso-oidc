@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\BlueprintFramework\Extensions\ssooidc\Http;
+namespace Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Http;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\BlueprintFramework\Extensions\ssooidc\Services\OidcDiscoveryService;
+use Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Services\OidcDiscoveryService;
 use Throwable;
 
 /**
@@ -84,7 +84,7 @@ class OidcLogoutController extends Controller
     /**
      * Reference-token pattern: the cookie set at login (OidcCallbackController)
      * only ever holds the (by-then-defunct) session_id, never the id_token
-     * itself - looks the matching ssooidc_sessions row up by it, and always
+     * itself - looks the matching sso_oidc_sessions row up by it, and always
      * consumes both (cookie forgotten, row deleted) whether or not a row
      * was actually found. Read from the raw $_COOKIE superglobal, not
      * Laravel's $request->cookie(): the cookie is deliberately set via
@@ -94,17 +94,17 @@ class OidcLogoutController extends Controller
      */
     private function consumeIdTokenHint(): ?string
     {
-        $sessionId = $_COOKIE['ssooidc_idth'] ?? null;
-        setcookie('ssooidc_idth', '', ['expires' => time() - 3600, 'path' => '/']);
+        $sessionId = $_COOKIE['sso_oidc_idth'] ?? null;
+        setcookie('sso_oidc_idth', '', ['expires' => time() - 3600, 'path' => '/']);
 
         if (!$sessionId) {
             return null;
         }
 
-        $row = DB::table('ssooidc_sessions')->where('session_id', $sessionId)->first();
+        $row = DB::table('sso_oidc_sessions')->where('session_id', $sessionId)->first();
 
         if ($row) {
-            DB::table('ssooidc_sessions')->where('id', $row->id)->delete();
+            DB::table('sso_oidc_sessions')->where('id', $row->id)->delete();
         }
 
         return $row->id_token ?? null;

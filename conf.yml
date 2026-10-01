@@ -1,6 +1,6 @@
 info:
-  name: "OIDC SSO Login"
-  identifier: "ssooidc"
+  name: "Pterodactyl SSO OIDC"
+  identifier: "sso-oidc"
   description: "Adds OpenID Connect (OIDC) single sign-on login to Pterodactyl, with just-in-time account creation/updates, email-based account matching (decided fresh on every login, nothing is persisted) and a 2FA skip for SSO logins."
   flags: ""
   version: "1.0.0"

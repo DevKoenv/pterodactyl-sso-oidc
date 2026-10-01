@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\BlueprintFramework\Extensions\ssooidc\Http;
+namespace Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Http;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -19,7 +19,7 @@ trait KillsSsoSessions
      */
     protected function killMatchingSessions(?string $sid, ?string $subject): int
     {
-        $query = DB::table('ssooidc_sessions');
+        $query = DB::table('sso_oidc_sessions');
 
         if ($sid !== null) {
             $query->where('sid', $sid);
@@ -47,13 +47,13 @@ trait KillsSsoSessions
             User::whereIn('id', $userIds)->update(['remember_token' => Str::random(60)]);
         }
 
-        DB::table('ssooidc_sessions')->whereIn('id', $sessions->pluck('id'))->delete();
+        DB::table('sso_oidc_sessions')->whereIn('id', $sessions->pluck('id'))->delete();
 
         // Opportunistic cleanup: rows only ever get removed when consumed
         // here or (for the exact same session) at RP-Initiated Logout, so
         // sessions that just expire without an explicit logout event would
         // otherwise accumulate forever.
-        DB::table('ssooidc_sessions')->where('created_at', '<', now()->subDays(30))->delete();
+        DB::table('sso_oidc_sessions')->where('created_at', '<', now()->subDays(30))->delete();
 
         return $sessions->count();
     }

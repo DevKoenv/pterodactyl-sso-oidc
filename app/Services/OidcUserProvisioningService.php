@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\BlueprintFramework\Extensions\ssooidc\Services;
+namespace Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Services;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\BlueprintFramework\Extensions\ssooidc\Http;
+namespace Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Http;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Pterodactyl\Http\Controllers\Controller;
 use Pterodactyl\Models\User;
-use Pterodactyl\BlueprintFramework\Extensions\ssooidc\Services\OidcClientService;
-use Pterodactyl\BlueprintFramework\Extensions\ssooidc\Services\OidcUserProvisioningService;
+use Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Services\OidcClientService;
+use Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Services\OidcUserProvisioningService;
 use RuntimeException;
 
 class OidcCallbackController extends Controller
@@ -28,10 +28,10 @@ class OidcCallbackController extends Controller
             throw new RuntimeException('SSO login is not enabled.');
         }
 
-        $expectedState = $request->session()->pull('ssooidc.state');
-        $expectedNonce = $request->session()->pull('ssooidc.nonce');
-        $codeVerifier = $request->session()->pull('ssooidc.code_verifier');
-        $intended = $request->session()->pull('ssooidc.intended', '/');
+        $expectedState = $request->session()->pull('sso_oidc.state');
+        $expectedNonce = $request->session()->pull('sso_oidc.nonce');
+        $codeVerifier = $request->session()->pull('sso_oidc.code_verifier');
+        $intended = $request->session()->pull('sso_oidc.intended', '/');
 
         $error = $request->query('error');
         if ($error) {
@@ -81,7 +81,7 @@ class OidcCallbackController extends Controller
         // by which point session data is gone - but cookies aren't tied to
         // server-side session storage, so a small cookie holding just the
         // (now-defunct) session_id survives long enough to look the
-        // matching ssooidc_sessions row (and its stored id_token) back up
+        // matching sso_oidc_sessions row (and its stored id_token) back up
         // for use as `id_token_hint` on RP-Initiated Logout.
         //
         // Putting the full id_token directly in the cookie was the first
@@ -96,7 +96,7 @@ class OidcCallbackController extends Controller
         // is a small, fixed-size opaque string regardless of how chatty
         // the provider's claims are, which sidesteps the problem entirely
         // rather than just working around Laravel's encryption overhead.
-        setcookie('ssooidc_idth', $sessionId, [
+        setcookie('sso_oidc_idth', $sessionId, [
             'expires' => time() + ((int) config('session.lifetime', 720) * 60),
             'path' => '/',
             'secure' => true,
@@ -195,7 +195,7 @@ class OidcCallbackController extends Controller
             return;
         }
 
-        DB::table('ssooidc_sessions')->insert([
+        DB::table('sso_oidc_sessions')->insert([
             'sid' => isset($claims['sid']) ? (string) $claims['sid'] : null,
             'subject' => $subject,
             'session_id' => $sessionId,

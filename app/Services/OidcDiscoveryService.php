@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\BlueprintFramework\Extensions\ssooidc\Services;
+namespace Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Services;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;
@@ -20,7 +20,7 @@ class OidcDiscoveryService
     public function discover(string $issuer): array
     {
         $issuer = rtrim($issuer, '/');
-        $cacheKey = 'ssooidc:discovery:' . md5($issuer);
+        $cacheKey = 'sso_oidc:discovery:' . md5($issuer);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($issuer) {
             $response = $this->client->get($issuer . '/.well-known/openid-configuration', [
@@ -49,7 +49,7 @@ class OidcDiscoveryService
             throw new RuntimeException('OIDC discovery document does not expose a jwks_uri.');
         }
 
-        $cacheKey = 'ssooidc:jwks:' . md5($jwksUri);
+        $cacheKey = 'sso_oidc:jwks:' . md5($jwksUri);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($jwksUri) {
             $response = $this->client->get($jwksUri, ['timeout' => 10]);

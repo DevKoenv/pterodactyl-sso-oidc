@@ -1,11 +1,11 @@
 <?php
 
-namespace Pterodactyl\BlueprintFramework\Extensions\ssooidc\Http;
+namespace Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Http;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\BlueprintFramework\Extensions\ssooidc\Services\OidcClientService;
+use Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Services\OidcClientService;
 use RuntimeException;
 
 class OidcRedirectController extends Controller
@@ -34,10 +34,10 @@ class OidcRedirectController extends Controller
         // separate base64url-random helper just for this.
         $codeVerifier = bin2hex(random_bytes(32));
 
-        $request->session()->put('ssooidc.state', $state);
-        $request->session()->put('ssooidc.nonce', $nonce);
-        $request->session()->put('ssooidc.code_verifier', $codeVerifier);
-        $request->session()->put('ssooidc.intended', $request->query('redirect_to', '/'));
+        $request->session()->put('sso_oidc.state', $state);
+        $request->session()->put('sso_oidc.nonce', $nonce);
+        $request->session()->put('sso_oidc.code_verifier', $codeVerifier);
+        $request->session()->put('sso_oidc.intended', $request->query('redirect_to', '/'));
 
         // Optional UX nicety: if the caller already knows who's likely
         // logging in (e.g. a link built with ?login_hint=user@example.com),

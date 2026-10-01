@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\BlueprintFramework\Extensions\ssooidc\Http;
+namespace Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Http;
 
 use Illuminate\Http\JsonResponse;
 use Pterodactyl\Http\Controllers\Controller;

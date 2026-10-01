@@ -2,7 +2,7 @@
     Deliberately bare content here - no @extends, no @section/@endsection.
     Confirmed straight from Blueprint's own install.sh
     (scripts/commands/extensions/install.sh): it builds
-    resources/views/admin/extensions/ssooidc/index.blade.php by copying its
+    resources/views/admin/extensions/sso_oidc/index.blade.php by copying its
     OWN template first (@extends('layouts.admin'), the icon/name/version/
     GitHub-link/gear-icon header, then `@section('content')
     @yield('extension.config') @yield('extension.description')` - note:

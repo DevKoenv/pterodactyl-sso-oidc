@@ -1,12 +1,12 @@
 <?php
 
-namespace Pterodactyl\BlueprintFramework\Extensions\ssooidc\Http;
+namespace Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Http;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\BlueprintFramework\Extensions\ssooidc\Services\OidcDiscoveryService;
+use Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Services\OidcDiscoveryService;
 use Throwable;
 
 /**
@@ -61,7 +61,7 @@ class OidcFrontchannelLogoutController extends Controller
 
         $matched = $this->killMatchingSessions((string) $sid, null);
 
-        Log::info('ssooidc frontchannel-logout received', [
+        Log::info('sso_oidc frontchannel-logout received', [
             'sid' => $sid,
             'iss' => $iss,
             'matched_rows' => $matched,

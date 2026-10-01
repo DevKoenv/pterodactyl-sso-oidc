@@ -16,14 +16,14 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('ssooidc_sessions', function (Blueprint $table) {
+        Schema::table('sso_oidc_sessions', function (Blueprint $table) {
             $table->text('id_token')->nullable()->after('user_id');
         });
     }
 
     public function down(): void
     {
-        Schema::table('ssooidc_sessions', function (Blueprint $table) {
+        Schema::table('sso_oidc_sessions', function (Blueprint $table) {
             $table->dropColumn('id_token');
         });
     }

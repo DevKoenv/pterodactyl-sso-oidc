@@ -1,12 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Pterodactyl\BlueprintFramework\Extensions\ssooidc\Http\OidcRedirectController;
-use Pterodactyl\BlueprintFramework\Extensions\ssooidc\Http\OidcCallbackController;
-use Pterodactyl\BlueprintFramework\Extensions\ssooidc\Http\OidcPublicConfigController;
-use Pterodactyl\BlueprintFramework\Extensions\ssooidc\Http\OidcLogoutController;
-use Pterodactyl\BlueprintFramework\Extensions\ssooidc\Http\OidcBackchannelLogoutController;
-use Pterodactyl\BlueprintFramework\Extensions\ssooidc\Http\OidcFrontchannelLogoutController;
+use Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Http\OidcRedirectController;
+use Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Http\OidcCallbackController;
+use Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Http\OidcPublicConfigController;
+use Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Http\OidcLogoutController;
+use Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Http\OidcBackchannelLogoutController;
+use Pterodactyl\BlueprintFramework\Extensions\sso_oidc\Http\OidcFrontchannelLogoutController;
 use Pterodactyl\Http\Middleware\VerifyCsrfToken;
 
 // becomes /extensions/{identifier}/redirect - kicks the browser off to the

@@ -14,7 +14,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('ssooidc_sessions', function (Blueprint $table) {
+        Schema::create('sso_oidc_sessions', function (Blueprint $table) {
             $table->id();
             $table->string('sid')->nullable()->index();
             $table->string('subject')->index();
@@ -25,6 +25,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('ssooidc_sessions');
+        Schema::dropIfExists('sso_oidc_sessions');
     }
 };

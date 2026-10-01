@@ -159,7 +159,7 @@ what each setting actually does and why it's built the way it is.
 ## Installation
 
 1. Download the latest `ssooidc.blueprint` file from the
-   [Releases](https://github.com/jw2702/pterodactyl-sso-oidc/releases) page.
+   [Releases](https://github.com/DevKoenv/pterodactyl-sso-oidc/releases) page.
 2. Upload it to your panel and run:
 
    ```bash
@@ -221,3 +221,15 @@ Last verified against:
 Since ID-token verification relies on `lcobucci/jwt` already being a
 Pterodactyl dependency, a future panel version dropping or majorly changing
 that package's API would break signature verification again.
+
+## Copyright
+
+This project is a fork of [jw2702/pterodactyl-sso-oidc](https://github.com/jw2702/pterodactyl-sso-oidc).
+
+Original work:
+Copyright © 2026 jw2702
+
+Modifications and additions in this fork:
+Copyright © 2026 DevKoenv
+
+The original project and this fork are licensed under the terms of the license included in the repository. All original copyright notices and license terms are retained.

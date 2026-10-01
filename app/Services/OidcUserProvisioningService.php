@@ -107,24 +107,50 @@ class OidcUserProvisioningService
 
     private function resolveIsAdmin(array $claims): bool
     {
-        $claimName = $this->settings['claim_admin'] ?? null;
+        $claimName = trim((string) ($this->settings['claim_admin'] ?? ''));
         $expected = $this->settings['claim_admin_value'] ?? null;
+        $expected = $expected === null ? '' : trim((string) $expected);
 
-        if (!$claimName || $expected === null || $expected === '') {
+        // No admin policy configured: all SSO users are normal users.
+        if ($claimName === '' && $expected === '') {
             return false;
         }
 
+        // Prevent partially configured admin settings from silently changing
+        // account privileges.
+        if ($claimName === '' || $expected === '') {
+            throw new RuntimeException(
+                'OIDC admin claim configuration is incomplete.'
+            );
+        }
+
+        // A configured admin claim must be present in the token/userinfo response.
+        // Do not silently demote an administrator because the IdP omitted it.
         if (!array_key_exists($claimName, $claims)) {
-            return false;
+            throw new RuntimeException(
+                'OIDC provider did not return the configured admin claim.'
+            );
         }
 
         $value = $claims[$claimName];
 
         if (is_array($value)) {
-            return in_array($expected, $value, true);
+            foreach ($value as $item) {
+                if ((string) $item === $expected) {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
-        return (string) $value === (string) $expected;
+        if (!is_scalar($value)) {
+            throw new RuntimeException(
+                'OIDC provider returned an invalid admin claim value.'
+            );
+        }
+
+        return (string) $value === $expected;
     }
 
     private function deriveUsername(array $claims, string $email): string
